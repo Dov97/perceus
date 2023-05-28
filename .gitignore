@@ -1,0 +1,22 @@
+# File Name   : .gitignore
+# Description : Ignore files and patterns in Git
+# Github Repo : https://github.com/Dov97/perceus
+# Author      : David Sellars
+# Email       : dovsellars@gmail.com
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# sqlite:
+db.sqlite3
+db.sqlite3-journal
+
+# Flask:
+instance/
+.webassets-cache
+
+# Environments
+.venv
+
