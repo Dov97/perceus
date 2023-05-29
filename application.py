@@ -8,19 +8,26 @@ Email       : dovsellars@gmail.com
 """
 
 import os
-from flask import Flask, request
+from flask import Flask, request, abort
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy_utils import database_exists
 
-
-# Initialise environment.
+""" Initialise App and Database. """
 app = Flask(__name__)
-app.app_context().push()
 
-# Select development or testing database depending on FLASK_ENV (see run.sh).
+"""
+Select development or testing database depending on FLASK_ENV.
+This is automatically handled when running from run.sh but can be manually
+exported via shell.
+"""
+dbName = None
+
 if os.getenv("FLASK_ENV") == "testing":
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test_data.db"
+    dbName = "test_data.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + dbName
 else:
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///dev_data.db"
+    dbName = "dev_data.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + dbName
 
 db = SQLAlchemy(app)
 
@@ -58,6 +65,21 @@ class User(db.Model):
     def __repr__(self):
         return (f"User({self.lastName} {self.firstName},Email: {self.emails},"
                 f"Phone Number: {self.PhoneNumber})")
+
+
+""" Create database if one does not exist already. """
+if database_exists('sqlite:///instance/'+ dbName):
+    print(dbName + " already exists")
+else:
+    print(dbName + " does not exist, will create " + dbName)
+    # this is needed in order for database session calls to create and commit.
+    with app.app_context():
+        try:
+            db.create_all()
+        except Exception as exception:
+            print("got the following exception when attempting db.create_all(): " + str(exception))
+
+
 
 
 if __name__ == '__main__':
