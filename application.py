@@ -32,23 +32,26 @@ else:
 db = SQLAlchemy(app)
 
 
+""" Classes """
 class Email(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mail = db.Column(db.String(50), unique=True, nullable=False)
-    # ForeignKey uses user.id for key.
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    # Column linked to to user ID - critical for link to User.
+    userId = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
-        return f"{self.id} - {self.mail}"
+        # Object output formatting.
+        return f"{'userId': {self.userId}, 'Email': {self.id} - {self.mail}}"
 
 
 class PhoneNumber(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(13), unique=True, nullable=False)
-    # ForeignKey uses user.id for key.
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    # Column linked to to user ID - critical for link to User.
+    userId = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
+        # Object output formatting.
         return f"{self.id} - {self.number}"
 
 
@@ -59,12 +62,12 @@ class User(db.Model):
     firstName = db.Column(db.String(30), nullable=False)
 
     # Class relationships (parent/child).
-    emails = db.relationship(Email, db.ForeignKey('user.id'), backref='user', lazy=True)
-    PhoneNumber = db.relationship(PhoneNumber, db.ForeignKey('user.id'), backref='user', lazy=True)
+    emails = db.relationship(Email, cascade="all,delete", backref='user', lazy=True)
+    phoneNumbers = db.relationship(PhoneNumber, cascade="all,delete", backref='user', lazy=True)
 
     def __repr__(self):
         return (f"User({self.lastName} {self.firstName},Email: {self.emails},"
-                f"Phone Number: {self.PhoneNumber})")
+                f"Phone Number: {self.phoneNumbers})")
 
 
 """ Create database if one does not exist already. """
