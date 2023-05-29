@@ -19,7 +19,7 @@ export DEVELOPMENT_DATABASE_URI="sqlite:///dev_data.db"
 
 # Global varbiles.
 python_path=$(which python3)
-app=""
+app="application.py"
 
 # Display the help information.
 Help()
