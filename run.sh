@@ -14,8 +14,6 @@
 
 # Setup enviroment.
 export FLASK_APP=application.py
-export TESTING_DATABASE_URI="sqlite:///test_data.db"
-export DEVELOPMENT_DATABASE_URI="sqlite:///dev_data.db"
 
 # Global varbiles.
 python_path=$(which python3)

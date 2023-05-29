@@ -16,5 +16,6 @@ pylama==8.4.1
 pytest==7.3.1
 snowballstemmer==2.2.0
 SQLAlchemy==2.0.15
+SQLAlchemy-Utils==0.41.1
 typing_extensions==4.6.2
 Werkzeug==2.3.4
