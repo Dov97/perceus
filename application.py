@@ -1,10 +1,22 @@
 """application.py.
 
-File Info   : Main application file for the Perceus Technologies take home
-              assignment.
-Github Repo : https://github.com/Dov97/perceus
+This script initialises a Flask application to manage users in a database.
+
+The application uses SQLAlchemy for handeling the database and SQLite for the database system.
+
+The Flask application provides the following functionalities:
+- Create a user with a given first name, last name, email, and phone number.
+- Get all users, a user by ID, a user by name.
+- Delete a user by ID.
+- Update a user email or phone number by ID.
+
+Endpoints:
+    Run ./run.sh gen_api_doc to generate endpoint documentation. Refer to README.md.
+
 Author      : David Sellars
 Email       : dovsellars@gmail.com
+Github Repo : https://github.com/Dov97/perceus
+
 """
 
 
@@ -14,10 +26,12 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_utils import database_exists
 
 
-"""
-Select development or testing database depending on FLASK_ENV.
-This is automatically handled when running from run.sh but can be manually
-exported via shell.
+"""Initialise Flask app and select database depending on FLASK_ENV.
+
+Development database : dev_data.db
+Unit testing database: test_data.db
+
+FLASK_ENV is automatically handled when running from run.sh but can be manually exported via shell.
 """
 app = Flask(__name__)
 dbName = None
@@ -33,11 +47,20 @@ db = SQLAlchemy(app)
 
 
 class Email(db.Model):
-    """Email class with db columns and a child relationship to User."""
+    """Email class containing Id, mail and userID table columns.
+
+    userID uses a foreign key to link emails to a specific user.
+    This class has a child relationship to User().
+
+    Parameters
+    ----------
+    db.Model : SQLAlchemy()
+        Maps Email class to a database table.
+
+    """
 
     id = db.Column(db.Integer, primary_key=True)
     mail = db.Column(db.String(50), unique=True, nullable=False)
-    # Column linked to to user ID.
     userId = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
@@ -46,11 +69,20 @@ class Email(db.Model):
 
 
 class PhoneNumber(db.Model):
-    """Phone number class with db columns and a child relationship to User."""
+    """Phone number class containing Id, number and userID table columns.
+
+    userID uses a foreign key to link phone number to a specific user.
+    This class has a child relationship to User().
+
+    Parameters
+    ----------
+    db.Model : SQLAlchemy()
+        Maps PhoneNumber class to a database table.
+
+    """
 
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(13), unique=True, nullable=False)
-    # Column linked to to user ID.
     userId = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
@@ -59,25 +91,32 @@ class PhoneNumber(db.Model):
 
 
 class User(db.Model):
-    """
-    User class with db name columns and parent relationships for emails and
-    phoneNumbers.
+    """User class containing Id, number table columns with parent relationships to Email and PhoneNumber.
+
+    Parameters
+    ----------
+    db.Model : SQLAlchemy()
+        Maps User class to a database table.
+
     """
 
     id = db.Column(db.Integer, primary_key=True)
     lastName = db.Column(db.String(30), nullable=False)
     firstName = db.Column(db.String(30), nullable=False)
 
-    # Class relationships (parent/child).
     emails = db.relationship(Email, cascade="all,delete", backref='user', lazy=True)
     phoneNumbers = db.relationship(PhoneNumber, cascade="all,delete", backref='user', lazy=True)
 
     def __repr__(self):
+        # Object output formatting.
         return (f"User({self.lastName} {self.firstName},Email: {self.emails},"
                 f"Phone Number: {self.phoneNumbers})")
 
 
-""" Create database if one does not exist already."""
+"""Create database if one does not exist already.
+
+The database created will depend on FLASK_APP (hence dbName). Refer to flask initialisation section.
+"""
 if database_exists('sqlite:///instance/' + dbName):
     print(dbName + " already exists")
 else:
@@ -87,28 +126,30 @@ else:
         try:
             db.create_all()
         except Exception as exception:
-            print("got the following exception when attempting db.create_all(): " + str(exception))
+            print("Exception when attempting db.create_all(): " + str(exception))
 
 
 @app.route('/')
 def index():
-    """Base route.
+    """Root / index route for application status.
 
-    Returns:
-        (string): Test string.
+    Returns
+    -------
+    Test string : String.
+
     """
-
     return 'Hello Perceus!'
 
 
-@app.route('/users', methods=["POST"])
+@app.route('/users/', methods=["POST"])
 def addUser():
-    """Add a user to database with POST.
+    """Add a user to database as POST.
 
-    Returns:
-        user.id (int): User ID with a 201 code.
+    Returns
+    -------
+    user ID (201, created) : String
+
     """
-
     user = User(
         lastName=request.json['lastName'],
         firstName=request.json['firstName'],
@@ -119,17 +160,18 @@ def addUser():
     db.session.add(user)
     db.session.commit()
 
-    return {'id': user.id}, 201
+    return {'User added': user.id}, 201
 
 
 @app.route('/users/')
 def getUsers():
     """Get all users in the database.
 
-    Returns:
-        userDict (string): All users information.
-    """
+    Returns
+    -------
+    All users (200, ok) : String
 
+    """
     users = User.query.all()
 
     userDict = []
@@ -139,20 +181,28 @@ def getUsers():
                          "emails": [email.mail for email in user.emails],
                          'phoneNumbers': [phone.number for phone in user.phoneNumbers]})
 
-    return {"users": userDict}
+    return {"users": userDict}, 200
 
 
 @app.route('/users/<int:id>')
 def getUserById(id):
     """Get a user from database with the users ID.
 
-    Parameters:
-        id (int): User ID.
+    Parameters
+    ----------
+    id : Int
+        user ID from route rule.
 
-    Returns:
-        userInfo (string): User information of route rule ID.
+    Returns
+    -------
+    user (200, ok) : String
+
+    Raise
+    -----
+    NotFound
+        If the user with the given ID is not found.
+
     """
-
     user = db.session.get(User, id)
     if user is None:
         abort(404)
@@ -162,43 +212,55 @@ def getUserById(id):
                 "emails": [email.mail for email in user.emails],
                 'phoneNumbers': [phone.number for phone in user.phoneNumbers]}
 
-    return {"user": userInfo}
+    return {"user": userInfo}, 200
 
 
 @app.route('/users/<string:lastName>/<string:firstName>')
 def getUserByName(firstName, lastName):
     """Get a user from database using last then first name.
 
-    Parameters:
-        firstName (string): Users first name from route rule.
-        lastName (string): Users last name from route rule.
+    Parameters
+    ----------
+    lastName : String
+        user last name from route rule.
+    firstName : String
+        user first name from route rule.
 
-    Returns:
-        userInfo (string): User information of route rule names.
+    Returns
+    -------
+    user (200, ok) : String
+
     """
-
-    userFilterByLast = User.query.filter_by(lastName=lastName).first()
-    user = userFilterByLast.query.filter_by(firstName=firstName).first()
+    userFilterByLastName = User.query.filter_by(lastName=lastName).first()
+    user = userFilterByLastName.query.filter_by(firstName=firstName).first()
 
     userInfo = {"lastName": user.lastName,
                 "firstName": user.firstName,
                 "emails": [email.mail for email in user.emails],
                 'phoneNumbers': [phone.number for phone in user.phoneNumbers]}
 
-    return {"user": userInfo}
+    return {"user": userInfo}, 200
 
 
 @app.route('/users/<int:id>', methods=['DELETE'])
 def deleteUser(id):
     """Delete a user from database with the users ID.
 
-    Parameters:
-        id (int): User ID from route rule.
+    Parameters
+    ----------
+    id : Int
+        user ID from route rule.
 
-    Returns:
-        id message (string): Deleted user ID with 200 response.
+    Returns
+    -------
+    user ID (200, ok) : String
+
+    Raise
+    -----
+    NotFound
+        If the user with the given ID is not found.
+
     """
-
     user = db.session.get(User, id)
     if user is None:
         abort(404)
@@ -206,107 +268,142 @@ def deleteUser(id):
     db.session.delete(user)
     db.session.commit()
 
-    return {'message': f'Deleted user with id: {id}'}, 200
+    return {'User deleted': id}, 200
 
 
 @app.route('/users/<int:id>/add_email', methods=['POST'])
 def addUserEmail(id):
-    """Add a user email to database with POST using the users ID.
+    """Add a user email to database with POST using the ID.
 
-    Parameters:
-        id (int): User ID from route rule.
+    Parameters
+    ----------
+    id : Int
+        user ID from route rule.
 
-    Returns:
-        new_email (string): Email added with 201 response.
+    Returns
+    -------
+    user email (201, created) : String
+
+    Raise
+    -----
+    NotFound
+        If the user with the given ID is not found.
+
     """
-
     user = db.session.get(User, id)
     if user is None:
         abort(404)
 
-    new_email = [Email(mail=email) for email in request.json.get('emails', [])]
+    newEmail = [Email(mail=email) for email in request.json.get('emails', [])]
 
-    user.emails.extend(new_email)
+    user.emails.extend(newEmail)
     db.session.commit()
 
-    return {'Email added': [email.mail for email in new_email]}, 201
+    return {'Email added': [email.mail for email in newEmail]}, 201
 
 
 @app.route('/users/<int:id>/add_phone_number', methods=['POST'])
 def addPhoneNumber(id):
-    """Add a user phone number to database with POST using the users ID.
+    """Add a user phone number to database with POST using the ID.
 
-    Parameters:
-        id (int): User ID from route rule.
+    Parameters
+    ----------
+    id : Int
+        user ID from route rule.
 
-    Returns:
-        new_number (string): Phone number added with 201 response.
+    Returns
+    -------
+    user phone number (201, created) : String
+
+    Raise
+    -----
+    NotFound
+        If the user with the given ID is not found.
+
+
     """
-
     user = db.session.get(User, id)
     if user is None:
         abort(404)
 
-    new_number = [PhoneNumber(number=phone_number) for phone_number in request.json.get('phoneNumbers', [])]
+    newNumber = [PhoneNumber(number=phone_number) for phone_number in request.json.get('phoneNumbers', [])]
 
-    user.phoneNumbers.extend(new_number)
+    user.phoneNumbers.extend(newNumber)
     db.session.commit()
 
-    return {'Number added': [phone.number for phone in new_number]}, 201
+    return {'Number added': [phone.number for phone in newNumber]}, 201
 
 
 @app.route('/users/<int:id>/update_email/<int:email_id>', methods=['POST'])
 def updateEmail(id, email_id):
     """Update a user email from the users ID in the database with POST.
 
-    Parameters:
-        id (int): User ID from route rule.
-        email_id (int): Email ID from route rule.
+    Parameters
+    ----------
+    id : Int
+        user ID from route rule.
+    email_id : Int
+        email ID from route rule.
 
-    Returns:
-        new_email (string): Updated email.
+    Returns
+    -------
+    newEmail : String
+
+    Raise
+    -----
+    NotFound
+        If the user with the given ID is not found.
+
     """
-
-    user = User.query.get(id)
+    user = db.session.get(User, id)
     if user is None:
         abort(404)
 
-    new_email = request.json.get('emails')
+    newEmail = request.json.get('emails')
 
     if email_id < len(user.emails):
-        user.emails[email_id].mail = new_email
+        user.emails[email_id].mail = newEmail
     else:
-        user.emails.append(Email(mail=new_email))
+        user.emails.append(Email(mail=newEmail))
         db.session.commit()
 
-    return {'Email updated': new_email}
+    return {'Email updated': newEmail}
 
 
 @app.route('/users/<int:id>/update_number/<int:number_id>', methods=['POST'])
-def updatePhoneNumber(id, email_id):
-    """Update a user phone number from the users ID in the database with POST.
+def updatePhoneNumber(id, numberId):
+    """Update a users phone number from the user's ID in the database with POST.
 
-    Parameters:
-        id (int): User ID from route rule.
-        email_id (int): phone number ID from route rule.
+    Parameters
+    ----------
+    id : Int
+        user ID from route rule.
+    numberId : Int
+        phone number ID from route rule.
 
-    Returns:
-        new_number (string): Updated phone number.
+    Returns
+    -------
+    newNumber : String
+
+    Raise
+    -----
+    NotFound
+        If the user with the given ID is not found.
+
     """
-
-    user = User.query.get(id)
+    user = db.session.get(User, id)
     if user is None:
         abort(404)
 
-    new_email = request.json.get('emails')
+    newNumber = request.json.get('phoneNumber')
 
-    if email_id < len(user.emails):
-        user.emails[email_id].mail = new_email
+    if numberId < len(user.phoneNumber):
+        user.phoneNumber[numberId].number = newNumber
     else:
-        user.emails.append(Email(mail=new_email))
+        user.phoneNumber.append(PhoneNumber(number=newNumber))
         db.session.commit()
 
-    return {'Email updated': new_email}
+    return {'Phone number updated': newNumber}
 
 
 if __name__ == '__main__':
