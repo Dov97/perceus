@@ -5,14 +5,14 @@
 # Author      : David Sellars
 # Email       : dovsellars@gmail.com
 
-# Only use for M1 Mac developmemt.
+# Default - used for M1 Mac development.
 #!/opt/homebrew/bin/bash
 
-# Use for linux development
+# Use for Linux and Intel Mac development
 # #!/bin/bash
 
 
-# Setup enviroment.
+# Setup Flask enviroment.
 export FLASK_APP=application.py
 
 # Global varbiles.
@@ -25,10 +25,11 @@ Help()
     usage='Usage: ./run.sh <option>
 
 OPTIONS
-    app                 Run application.py
-    code_audit          Run pycodestyle, pyflakes, pylint and radon via pylama.
-    docstr_audit        Run pydocstyle.
+    app                 Run application.py.
+    code_audit          Run pylama linters; pyflakes, pylint, radon.
+    doc_audit           Run pydocstyl linter.
     unit_tests          Run pytest unit tests.
+    gen_api_doc         Run pdoc generating API documentation.
 
 EXIT STATUS
   0  Success.
@@ -51,14 +52,18 @@ case "${1}" in
         pylama --verbose --options ./setup.cfg "${app}"
         return_code="${PIPESTATUS[0]}"
         ;;
-    "docstr_audit")
-        pydocstyle "./${app}"
+    "doc_audit")
+        pydocstyle --ignore D105,D213,D203 "./${app}"
         return_code="${PIPESTATUS[0]}"
         ;;
     "unit_tests")
         # Use ./services/test_data.db, designed to be over written by tests.
         export FLASK_ENV=testing
         pytest -vs ./unit_tests
+        return_code="${PIPESTATUS[0]}"
+        ;;
+    "gen_api_doc")
+        pdoc ./application.py
         return_code="${PIPESTATUS[0]}"
         ;;
     *)
