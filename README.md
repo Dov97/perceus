@@ -15,10 +15,8 @@ Files and FS Structure:
     .
     ├── README.md --------------- This file.
     ├── application.py ---------- Main application run via run.sh.
-    ├── instance
-    │   ├── dev_data.db --------- Dev sqlite DB for application runs (creation handled).
-    │   └── test_data.db -------- Test sqlite DB for unit test runs (creation handled).
-    ├── requirements.txt -------- Pip3 requirements.
+    ├── instance ---------------- Folder generated with dev or test database on app or unit_tests runs.
+    ├── requirements.txt -------- Pip3 requirements to install.
     ├── run.sh ------------------ Singular run script for all operations.
     ├── setup.cfg --------------- Pylama configuration (code formatting).
     └── unit_tests
@@ -36,7 +34,7 @@ Prerequisites:
 
 Setup:
 
-    1.  Clone the solution repo:
+    1.  Clone the solution repo if not already done:
             git clone https://github.com/Dov97/perceus.git
 
     2.  Cd into ./perceus and create a python venv to isolate Python from system Python:
