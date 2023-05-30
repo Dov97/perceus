@@ -1,4 +1,4 @@
-# File Name   : run.sh
+# run.sh
 # Description : Singular run file for the Perceus Technologies take home
 #               assignment. Both Linux and Mac supported.
 # Github Repo : https://github.com/Dov97/perceus

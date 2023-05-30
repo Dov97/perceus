@@ -160,7 +160,7 @@ def addUser():
     db.session.add(user)
     db.session.commit()
 
-    return {'User added': user.id}, 201
+    return {'user_id': user.id}, 201
 
 
 @app.route('/users/')
@@ -268,7 +268,7 @@ def deleteUser(id):
     db.session.delete(user)
     db.session.commit()
 
-    return {'User deleted': id}, 200
+    return {'user_id': id}, 200
 
 
 @app.route('/users/<int:id>/add_email', methods=['POST'])
@@ -299,7 +299,7 @@ def addUserEmail(id):
     user.emails.extend(newEmail)
     db.session.commit()
 
-    return {'Email added': [email.mail for email in newEmail]}, 201
+    return {'user_email': [email.mail for email in newEmail]}, 201
 
 
 @app.route('/users/<int:id>/add_phone_number', methods=['POST'])
@@ -331,7 +331,7 @@ def addPhoneNumber(id):
     user.phoneNumbers.extend(newNumber)
     db.session.commit()
 
-    return {'Number added': [phone.number for phone in newNumber]}, 201
+    return {'user_number': [phone.number for phone in newNumber]}, 201
 
 
 @app.route('/users/<int:id>/update_email/<int:email_id>', methods=['POST'])
@@ -367,7 +367,7 @@ def updateEmail(id, email_id):
         user.emails.append(Email(mail=newEmail))
         db.session.commit()
 
-    return {'Email updated': newEmail}
+    return {'user_email': newEmail}
 
 
 @app.route('/users/<int:id>/update_number/<int:number_id>', methods=['POST'])
@@ -403,7 +403,7 @@ def updatePhoneNumber(id, numberId):
         user.phoneNumber.append(PhoneNumber(number=newNumber))
         db.session.commit()
 
-    return {'Phone number updated': newNumber}
+    return {'user_number': newNumber}
 
 
 if __name__ == '__main__':
