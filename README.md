@@ -52,8 +52,7 @@ Setup:
 
 Usage:
 
-    Run.sh is provided as a single run point for all operations. To run a
-    opporation follow the run.sh usage (help):
+    Run.sh provides a single run point for all operations. To run a opporation follow the run.sh usage (help):
 
         Usage: ./run.sh <option>
 
@@ -74,8 +73,7 @@ Usage:
             export FLASK_ENV=development
             python3 ./application.py
 
-            Where the export sets the Flask environment, setting the database used
-            to dev_data.db.
+            Where the export sets the Flask environment, setting the database used to dev_data.db.
 
         code_audit:
 
@@ -90,8 +88,7 @@ Usage:
             export FLASK_ENV=testing
             pytest -vs ./unit_tests
 
-            Where the export sets the Flask environment, setting the database used
-            to test_data.db.
+            Where the export sets the Flask environment, setting the database used to test_data.db.
 
         gen_api_doc:
 
