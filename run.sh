@@ -1,15 +1,10 @@
+#!/bin/bash
+
 # run.sh
-# Description : Singular run file for the Perceus Technologies take home
-#               assignment. Both Linux and Mac supported.
-# Github Repo : https://github.com/Dov97/perceus
+# Description : Singular run script for Perceus Technologies home assignment.
 # Author      : David Sellars
 # Email       : dovsellars@gmail.com
-
-# Default - used for M1 Mac development.
-#!/opt/homebrew/bin/bash
-
-# Use for Linux and Intel Mac development
-# #!/bin/bash
+# Github Repo : https://github.com/Dov97/perceus
 
 
 # Setup Flask enviroment.

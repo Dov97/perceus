@@ -10,11 +10,6 @@ Task:
     Repo: https://github.com/perseusEngineering/candidate-coding-challenges/tree/master/backend-challenges/user-service
 
 
-Solution:
-
-    Repo: https://github.com/Dov97/perceus
-
-
 Files and FS Structure:
 
     .
@@ -24,7 +19,7 @@ Files and FS Structure:
     │   ├── dev_data.db --------- Dev sqlite DB for application runs (creation handled).
     │   └── test_data.db -------- Test sqlite DB for unit test runs (creation handled).
     ├── requirements.txt -------- Pip3 requirements.
-    ├── run.sh ------------------ Singular run script for all opporations.
+    ├── run.sh ------------------ Singular run script for all operations.
     ├── setup.cfg --------------- Pylama configuration (code formatting).
     └── unit_tests
         ├── __init__.py
@@ -33,7 +28,7 @@ Files and FS Structure:
 
 Prerequisites:
 
-    1.  Mac or Linux shell.
+    1.  Bash shell, see "Usage" for how to run operations without run.sh.
     2.  Git.
     3.  Python 3.11.3 installed and on system PATH.
     4.  Pip3 installed via Python.
@@ -41,23 +36,25 @@ Prerequisites:
 
 Setup:
 
-    1.  Create a python venv to isolate Python from system Python:
-            python3 -m venv .venv
+    1.  Clone the solution repo:
+            git clone https://github.com/Dov97/perceus.git
 
-    2.  Activate the venv:
-            source ./.venv//bin/activate
+    2.  Cd into ./perceus and create a python venv to isolate Python from system Python:
+            cd ./perceus && python3 -m venv .venv
 
-    3.  Run the following to install all pip requirements:
+    3.  Activate the venv:
+            source ./.venv/bin/activate
+
+    4.  Upgrade pip:
+            pip install --upgrade pip
+
+    5.  Install all pip requirements:
             pip3 install -r ./requirements.txt
-
-    4.  Enable the correct system shbang in run.sh (#!)
-        M1 Mac is by default, Intel Mac and Linux can be enabled.
-        Windows users refer to "Usage" to run with out run.sh.
 
 
 Usage:
 
-    Run.sh is provided as a single run point for all opporations. To run a
+    Run.sh is provided as a single run point for all operations. To run a
     opporation follow the run.sh usage (help):
 
         Usage: ./run.sh <option>

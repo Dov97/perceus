@@ -1,9 +1,9 @@
 """test_application.py.
 
 File Info   : Unit test the application
-Github Repo : https://github.com/Dov97/perceus_interview_project_practice
 Author      : David Sellars
 Email       : dovsellars@gmail.com
+Github Repo : https://github.com/Dov97/perceus
 """
 
 import os
@@ -67,7 +67,7 @@ def newEmail():
 @pytest.fixture
 def newPhoneNumber():
     """Create new phone number and return phoneNumber instance."""
-    phoneNumber = PhoneNumber(number="447890123456")
+    phoneNumber = PhoneNumber(number="440987654321")
 
     return phoneNumber
 
@@ -199,7 +199,7 @@ def test_update_user_phone_number(client, initDatabase, newUser, newPhoneNumber)
     initDatabase.session.add(newUser)
     initDatabase.session.commit()
 
-    response = client.post('/users/1/update_number/0', json={
+    response = client.post('/users/1/update_phone_number/0', json={
         'phoneNumbers': newPhoneNumber.number
     })
 

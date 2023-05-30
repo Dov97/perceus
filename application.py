@@ -151,8 +151,8 @@ def addUser():
 
     """
     user = User(
-        lastName=request.json['lastName'],
-        firstName=request.json['firstName'],
+        lastName=request.json.get('lastName'),
+        firstName=request.json.get('firstName'),
         emails=[Email(mail=email) for email in request.json.get('emails', [])],
         phoneNumbers=[PhoneNumber(number=number) for number in request.json.get('phoneNumbers', [])]
     )
@@ -365,20 +365,21 @@ def updateEmail(id, email_id):
         user.emails[email_id].mail = newEmail
     else:
         user.emails.append(Email(mail=newEmail))
-        db.session.commit()
+
+    db.session.commit()
 
     return {'user_email': newEmail}
 
 
-@app.route('/users/<int:id>/update_number/<int:number_id>', methods=['POST'])
-def updatePhoneNumber(id, numberId):
+@app.route('/users/<int:id>/update_phone_number/<int:number_id>', methods=['POST'])
+def updatePhoneNumber(id, number_id):
     """Update a users phone number from the user's ID in the database with POST.
 
     Parameters
     ----------
     id : Int
         user ID from route rule.
-    numberId : Int
+    number_id : Int
         phone number ID from route rule.
 
     Returns
@@ -395,13 +396,14 @@ def updatePhoneNumber(id, numberId):
     if user is None:
         abort(404)
 
-    newNumber = request.json.get('phoneNumber')
+    newNumber = request.json.get('phoneNumbers')
 
-    if numberId < len(user.phoneNumber):
-        user.phoneNumber[numberId].number = newNumber
+    if number_id < len(user.phoneNumbers):
+        user.phoneNumbers[number_id].number = newNumber
     else:
-        user.phoneNumber.append(PhoneNumber(number=newNumber))
-        db.session.commit()
+        user.phoneNumbers.append(PhoneNumber(number=newNumber))
+
+    db.session.commit()
 
     return {'user_number': newNumber}
 
